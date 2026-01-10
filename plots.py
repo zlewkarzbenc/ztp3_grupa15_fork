@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 def plot_means(monthly_means, cities, years):
+    # filtrowanie danych do wybranych miast oraz liczenie średniej miesięcznej dla miasta
     city_monthly = (
         monthly_means[monthly_means["Miejscowość"].isin(cities)]
         .groupby(["Rok", "Miesiąc", "Miejscowość"])["Mean PM25"]
@@ -10,6 +11,7 @@ def plot_means(monthly_means, cities, years):
         .reset_index()
     )
 
+    # ;pivot danych tak żeby łatwiej było stworzyć wykres
     df = city_monthly[city_monthly["Rok"].isin(years)]
     df = df.pivot_table(
         values="Mean PM25",
@@ -34,14 +36,17 @@ def plot_means(monthly_means, cities, years):
 
 def heatmaps_means(city_monthly, years):
     df = city_monthly.copy()
+    # weryfikacja, że kolumny mają poprawne typy (czyli liczbowe)
     df["Mean PM25"] = pd.to_numeric(df["Mean PM25"], errors="coerce")
     df["Rok"] = pd.to_numeric(df["Rok"], errors="coerce").astype("Int64")
     df["Miesiąc"] = pd.to_numeric(df["Miesiąc"], errors="coerce").astype("Int64")
+    # filtrowanie wybranych lat
     df = df[df["Rok"].isin(years)]
 
     cities = df["Miejscowość"].unique()
     vmin, vmax = df["Mean PM25"].min(), df["Mean PM25"].max()
 
+    # siatka wykresów i dla każdego miasta heatmapa
     fig, axes = plt.subplots(6, 3, figsize=(18, 36))
     axes = axes.flatten()
 
@@ -66,6 +71,7 @@ def heatmaps_means(city_monthly, years):
 
 
 def plot_overnorm(over_counts, selected, years):
+    # na podstawie listy stacji z tabeli filtrujemy przekroczenia tylko do tych stacji i wybranych lat i tworzymy wykres
     df = over_counts.copy()
     stations = selected["Kod stacji"].unique()
     df = df[df["Kod stacji"].isin(stations)]

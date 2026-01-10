@@ -106,7 +106,6 @@ def make_pm25_data(years, gios_url_ids, gios_pm25_file, clean_info, outfile):
     for y, df in cleaned.items()
     }
 
-
     # station code updates
     cleaned = {y: update_stations(df, meta) for y, df in cleaned.items()}
 
