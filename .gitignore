@@ -2,3 +2,10 @@
 __pycache__/
 *.pyc
 *.pyo
+
+# Pytest
+.pytest_cache/
+
+# Editor
+.vscode/
+
