@@ -63,7 +63,16 @@ def update_stations(df, meta):
     new_code = 'Kod stacji'
 
     # creating a dictionary with code mapping (old: new)
-    mapping_codes = dict(zip(meta[old_code], meta[new_code])) 
+    mapping_codes = {}
+    for old, new in zip(meta[old_code], meta[new_code]):
+        if pd.isna(old):
+            continue
+
+        # handling examples with multiple old station codes    
+        multiple_codes = [codes.strip() for codes in str(old).split(",") if codes.strip()] 
+        
+        for old in multiple_codes:
+            mapping_codes[old] = new
     df = df.rename(columns=mapping_codes)
     return df
 

@@ -1,4 +1,11 @@
+# Python cache
 __pycache__/
 *.pyc
+*.pyo
+
+# Pytest
 .pytest_cache/
+
+# Editor
 .vscode/
+
