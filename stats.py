@@ -139,3 +139,36 @@ def top_bottom_stations(over_counts, year, n=3):
     bottom = df.nsmallest(n, col)
     out = pd.concat([top, bottom], ignore_index=True)
     return out
+
+def wojew_over_treshold(long: pd.DataFrame, wojew_dict: dict, treshold: int = 15):        
+    """
+    Zlicza dni z przekroczeniem progu `treshold` przez średnie PM2.5 z rozróżnieniem na województwa
+
+    Args:
+        long (pandas.DataFrame): ramka danych w formacie long
+        wojew_dict (dict): słownik przypisujący nazwy województw ich dwuliterowym kodom (Kod: Nazwa)
+        treshold (int): maksymalne dopuszczalne stężenie PM2.5
+
+    Returns:
+        pandas.DataFrame: Zliczenia dni z przekroczeniem normy PM2.5 posortowanej malejąco
+    """
+    long['date'] = long["datetime"].dt.date
+    long["Województwo"] = long["Kod stacji"].str[:2]
+    long['Województwo'] = long["Województwo"].apply(lambda code: wojew_dict[code])
+
+    long = long.drop("Miejscowość", axis=1)
+
+    daily  = (
+        long
+        .groupby(["Województwo", "Kod stacji", "date"], as_index=False)
+        .agg(PM25=("PM25", "mean"))
+    )
+    wojew_means = (
+        daily
+        .groupby(['date', "Województwo"], as_index=False)
+        .agg(PM25=("PM25", "mean"))
+    )
+
+    wojew_means['exceeds_treshold'] = wojew_means['PM25'] > treshold
+    counts = wojew_means.groupby('Województwo')['exceeds_treshold'].sum()
+    return counts.sort_values(ascending=False)

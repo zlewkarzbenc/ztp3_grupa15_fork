@@ -120,3 +120,51 @@ def plot_overnorm(over_counts, selected, years):
     plt.grid(True)
     plt.tight_layout()
     plt.show()
+
+def plot_wojewodztwa(df: pd.DataFrame, year: int = 2024, treshold: int = 15):
+    """
+    Rysuje wykres słupkowy liczby dni z przekroczeniem normy PM2.5 dla wszystkich województw.
+    
+    Args:
+        df (pandas.DataFrame): Liczba dni z przekroczeniem normy PM2.5.
+        year (int): Rok pochodzenia danych uwzględnianych na wykresie.
+        treshold (int): maksymalne dopuszczalne stężenie PM2.5
+
+    Returns:
+        None: Funkcja wyświetla wykres.
+    """
+
+    sns.set_theme(style="whitegrid", context="talk")
+
+    df = df.sort_values(ascending=False)
+   
+    df = df.reset_index()
+    df.columns = ["name", "value"]
+
+    fig, ax = plt.subplots(figsize=(16, 10))
+
+    sns.barplot(
+        data=df,
+        x="name",
+        y="value",
+        hue="name",
+        palette='magma',
+        ax=ax,
+    )
+
+    ax.set_title(f"Liczba dni z przekroczeniem normy stężenia PM2.5 w roku {year} w poszczególnych województwach")
+
+    # Rotate long labels
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=30, ha="right")
+
+    # Add value labels on top of bars
+    for container in ax.containers:
+        # ax.bar_label(container, fmt="%.2f", padding=3)
+        ax.bar_label(container, padding=3)
+
+    # Labels and legend
+    ax.set_xlabel("")
+    ax.set_ylabel(f"Liczba dni z przekroczeniem progu {treshold} µg/m³")
+
+    plt.tight_layout()
+    plt.show()
